@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <div class="123">
+      <div>
+        <div id="id" class="class"></div>
+      </div>
+    </div>
+    <script>
+      function getSimpleSelectors(selector) {
+        let simpleSelectorList = [];
+        for (let child of selector) {
+          if (simpleSelectorList.length === 0) {
+            simpleSelectorList.push(child);
+          } else if (
+            simpleSelectorList[simpleSelectorList.length - 1] === "#" ||
+            simpleSelectorList[simpleSelectorList.length - 1] === "."
+          ) {
+            simpleSelectorList[simpleSelectorList.length - 1] += child;
+          } else {
+            simpleSelectorList.push(child);
+          }
+        }
+        return simpleSelectorList;
+      }
+      function matchSimpleSelecotr(selector, element) {
+        if (!selector) return false;
+        if (selector.charAt(0) == "#" && element.attributes !== void 0) {
+          var attr = element.getAttribute("id");
+          if (attr !== null && attr === selector.replace("#", "")) return true;
+        } else if (selector.charAt(0) == "." && element.attributes !== void 0) {
+          var attr = element.getAttribute("class");
+          if (
+            attr !== null &&
+            attr.split(" ").find((t) => t === selector.replace(".", ""))
+          )
+            return true;
+        } else {
+          if (element.tagName.toLowerCase() === selector.toLowerCase()) {
+            return true;
+          }
+        }
+        return false;
+      }
+      function matchParts(selectorParts, element, index) {
+        if (!element || index > selectorParts.length - 1) return false;
+        let result = true;
+        let selectorPart = selectorParts[index];
+        if (selectorPart !== null && selectorPart !== void 0) {
+          let selectorPartChildren = selectorPart
+            .split(/([#.])/)
+            .filter((t) => t.length > 0);
+          let simpleSelectorList = getSimpleSelectors(selectorPartChildren);
+          for (let simpleSelector of simpleSelectorList) {
+            if (!matchSimpleSelecotr(simpleSelector, element)) {
+              result = false;
+            }
+          }
+          index;
+
+          if (result) {
+            if (index < selectorParts.length - 1) {
+              return matchParts(
+                selectorParts,
+                element.parentElement,
+                index + 1
+              );
+            } else {
+              return true;
+            }
+          } else {
+            if (index > 0) {
+              return matchParts(selectorParts, element.parentElement, index);
+            } else {
+              return false;
+            }
+          }
+        }
+        return result;
+      }
+      function match(selector, element) {
+        let result = true;
+        let selectorParts = selector
+          .split(" ")
+          .filter((t) => t !== " ")
+          .reverse();
+        return matchParts(selectorParts, element, 0);
+      }
+      console.log(match("div #id.class", document.getElementById("id")));
+    </script>
+  </body>
+</html>

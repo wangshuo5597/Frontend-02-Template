@@ -20,7 +20,7 @@
     constructor(point, parent, end) {
       this.point = point;
       this.parent = parent;
-      this.g = parent.g + 1;
+      this.g = parent !== null ? parent.g + 1 : 1;
       this.h = (point[0] - end[0]) ** 2 + (point[1] - end[1]) ** 2;
     }
     get f() {
@@ -109,39 +109,49 @@
   }
   async function findPath(map, start, end) {
     let table = Object.create(map);
-    let queue = new Heap([start], (a, b) => distance(a) - distance(b));
+    let queue = new Heap([new Step(start, null, end)], (a, b) => a.f - b.f);
     async function insert(x, y, pre) {
       if (x < 0 || x >= 100 || y < 0 || y >= 100) return;
-      if (table[y * 100 + x]) return;
+      if (
+        table[y * 100 + x] &&
+        typeof table[y * 100 + x] === 'number' &&
+        table[y * 100 + x] > 0
+      )
+        return;
       await sleep(5);
       container.children[y * 100 + x].style.backgroundColor = 'lightgreen';
-      table[y * 100 + x] = pre;
-      queue.give([x, y]);
+      if (table[y * 100 + x] === 0 || table[y * 100 + x].parent.g > pre.g + 1) {
+        let step = new Step([x, y], pre, end);
+        table[y * 100 + x] = step;
+        queue.give(step);
+      }
     }
     function distance(point) {
       return (point[0] - end[0]) ** 2 + (point[1] - end[1]) ** 2;
     }
     while (queue.size()) {
-      let [x, y] = queue.take();
+      let step = queue.take();
+      let [x, y] = step.point;
       if (x === end[0] && y === end[1]) {
         let path = [];
         while (x != start[0] || y != start[1]) {
           path.push(map[y * 100 + x]);
-          [x, y] = table[y * 100 + x];
+          step = table[y * 100 + x].parent;
+          [x, y] = step.point;
           container.children[y * 100 + x].style.backgroundColor = 'purple';
         }
         console.log('find path', path.length);
         return path;
       }
-      await insert(x - 1, y, [x, y]);
-      await insert(x, y - 1, [x, y]);
-      await insert(x + 1, y, [x, y]);
-      await insert(x, y + 1, [x, y]);
+      await insert(x - 1, y, step);
+      await insert(x, y - 1, step);
+      await insert(x + 1, y, step);
+      await insert(x, y + 1, step);
 
-      await insert(x - 1, y - 1, [x, y]);
-      await insert(x + 1, y - 1, [x, y]);
-      await insert(x - 1, y + 1, [x, y]);
-      await insert(x + 1, y + 1, [x, y]);
+      await insert(x - 1, y - 1, step);
+      await insert(x + 1, y - 1, step);
+      await insert(x - 1, y + 1, step);
+      await insert(x + 1, y + 1, step);
     }
     return false;
   }

@@ -36,11 +36,6 @@
     let move = event => {
       let range = getNearest(event.clientX, event.clientY);
       range.insertNode(dragable);
-      /*
-      dragable.style.transform = `translate(${
-        baseX + event.clientX - startX
-      }px,${baseY + event.clientY - startY}px)`;
-      */
     };
     document.addEventListener('mousemove', move);
     document.addEventListener('mouseup', up);

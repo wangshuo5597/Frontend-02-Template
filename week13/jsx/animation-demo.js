@@ -1,6 +1,5 @@
-import { Component, createElement } from "./framework.js";
-import { Carousel } from "./carousel.js";
 import { Animation, Timeline } from "./animation.js";
+import { ease } from "./ease.js";
 
 let tl = new Timeline();
 tl.start();
@@ -12,10 +11,13 @@ tl.add(
     500,
     2000,
     0,
-    null,
+    ease,
     (v) => `translateX(${v}px)`
   )
 );
+
+document.querySelector("#el2").style.transition = "2s ease";
+document.querySelector("#el2").style.transform = "translateX(500px)";
 
 document
   .querySelector("#pause-btn")

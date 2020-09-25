@@ -55,8 +55,7 @@ export class Timeline {
   }
   reset() {
     this.pause();
-    this.starte = "inited";
-    let startTime = Date.now();
+    this.state = "inited";
     this[PAUSE_TIME] = 0;
     this[ANIMATIONS] = new Set();
     this[START_TIME] = new Map();

@@ -19,10 +19,12 @@ export class Listener {
     let isListeningMouse = false;
     let contexts = new Map();
     element.addEventListener("mousedown", (event) => {
+      console.log("mousedown");
       let context = Object.create(null);
       contexts.set("mouse" + (1 << event.button), context);
       recognizer.start(event, context);
       let mousemove = (event) => {
+        console.log("mousemove", event);
         let button = 1;
         while (button <= event.buttons) {
           if (button & event.buttons) {
@@ -156,12 +158,18 @@ export class Recognizer {
   }
   end(point, context) {
     if (context.isTap) {
-      this.dispatcher.dispatch("tap", {});
+      this.dispatcher.dispatch("tap", {
+        clientX: point.clientX,
+        clientY: point.clientY,
+      });
       clearTimeout(context.handler);
     }
 
     if (context.isPress) {
-      this.dispatcher.dispatch("pressend", {});
+      this.dispatcher.dispatch("pressend", {
+        clientX: point.clientX,
+        clientY: point.clientY,
+      });
     }
     context.points = context.points.filter(
       (point) => Date.now() - point.t < 500
@@ -198,8 +206,18 @@ export class Recognizer {
         clientY: point.clientY,
         isVertical: context.isVertical,
         isFlick: context.isFlick,
+        velocity: v,
       });
     }
+    this.dispatcher.dispatch("end", {
+      startX: context.startX,
+      startY: context.startY,
+      clientX: point.clientX,
+      clientY: point.clientY,
+      isVertical: context.isVertical,
+      isFlick: context.isFlick,
+      velocity: v,
+    });
   }
   cancel(point, context) {
     clearTimeout(context.handler);

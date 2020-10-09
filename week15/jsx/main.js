@@ -3,10 +3,28 @@ import { Carousel } from "./carousel.js";
 import { Animation, Timeline } from "./animation.js";
 
 let d = [
-  "http://pic-bucket.ws.126.net/photo/0001/2020-09-17/FMNIIOIT56NT0001NOS.jpg",
-  "http://pic-bucket.ws.126.net/photo/0001/2020-09-17/FMNIIOIU56NT0001NOS.jpg",
-  "http://pic-bucket.ws.126.net/photo/0001/2020-09-17/FMNIIOIV56NT0001NOS.jpg",
-  "http://pic-bucket.ws.126.net/photo/0001/2020-09-17/FMNIIOJ056NT0001NOS.jpg",
+  {
+    img: "http://localhost:8080/assets/1.jpg",
+    url: "https://time.geekbang.org",
+  },
+  {
+    img: "http://localhost:8080/assets/2.jpg",
+    url: "https://time.geekbang.org",
+  },
+  {
+    img: "http://localhost:8080/assets/3.jpg",
+    url: "https://time.geekbang.org",
+  },
+  {
+    img: "http://localhost:8080/assets/4.jpg",
+    url: "https://time.geekbang.org",
+  },
 ];
-let a = <Carousel src={d} />;
+let a = (
+  <Carousel
+    src={d}
+    onChange={(event) => console.log(event.detail.position)}
+    onClick={(event) => (window.location.href = event.detail.data.url)}
+  />
+);
 a.mountTo(document.body);
